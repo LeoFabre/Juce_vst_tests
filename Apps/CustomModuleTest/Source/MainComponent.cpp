@@ -1,6 +1,6 @@
 #include "MainComponent.h"
 
-namespace GuiApp
+namespace Omni
 {
 MainComponent::MainComponent()
 {
@@ -17,4 +17,4 @@ void MainComponent::resized()
 {
     dummyLabel.setBounds(getLocalBounds());
 }
-} // namespace GuiApp
+} // namespace Omni

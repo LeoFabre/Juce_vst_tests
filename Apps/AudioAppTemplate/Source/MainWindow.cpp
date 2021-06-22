@@ -39,4 +39,4 @@ Colour MainWindow::getBackgroundColour()
         ResizableWindow::backgroundColourId);
 }
 
-} // namespace GuiApp
+} // namespace Omni

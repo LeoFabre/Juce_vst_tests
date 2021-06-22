@@ -33,4 +33,4 @@ void MainComponent::getNextAudioBlock(const juce::AudioSourceChannelInfo& buffer
     noise.process(*bufferToFill.buffer);
 }
 
-} // namespace GuiApp
+} // namespace Omni

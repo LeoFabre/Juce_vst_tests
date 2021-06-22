@@ -11,4 +11,4 @@ using juce::Colour;
 using juce::Component;
 using juce::Graphics;
 using juce::String;
-} // namespace GuiApp
+} // namespace Omni

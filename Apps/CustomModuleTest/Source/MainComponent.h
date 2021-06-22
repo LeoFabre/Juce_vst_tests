@@ -2,7 +2,7 @@
 
 #include "CommonHeader.h"
 
-namespace GuiApp
+namespace Omni
 {
 class MainComponent : public Component
 {
@@ -16,4 +16,4 @@ private:
     CustomModule::DummyLabel dummyLabel;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainComponent)
 };
-} // namespace GuiApp
+} // namespace Omni

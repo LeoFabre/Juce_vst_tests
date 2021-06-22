@@ -2,7 +2,7 @@
 
 #include "MainComponent.h"
 
-namespace GuiApp
+namespace Omni
 {
 class MainWindow : public juce::DocumentWindow
 {

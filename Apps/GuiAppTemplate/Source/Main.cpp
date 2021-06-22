@@ -1,6 +1,6 @@
 #include "MainWindow.h"
 
-namespace GuiApp
+namespace Omni
 {
 class GuiAppTemplateApplication : public juce::JUCEApplication
 {
@@ -27,4 +27,4 @@ private:
 // This macro generates the main() routine that launches the app.
 START_JUCE_APPLICATION(GuiAppTemplateApplication)
 
-} // namespace GuiApp
+} // namespace Omni

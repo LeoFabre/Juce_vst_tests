@@ -1,6 +1,6 @@
 #include "MainWindow.h"
 
-namespace GuiApp
+namespace Omni
 {
 constexpr bool isMobile()
 {
@@ -39,4 +39,4 @@ Colour MainWindow::getBackgroundColour()
         ResizableWindow::backgroundColourId);
 }
 
-} // namespace GuiApp
+} // namespace Omni
