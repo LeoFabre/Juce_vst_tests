@@ -45,5 +45,4 @@ public:
 private:
     static BusesProperties getBuses();
 
-    Parameters parameters;
 };

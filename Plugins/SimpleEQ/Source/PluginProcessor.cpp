@@ -15,17 +15,12 @@ juce::String getParamID(juce::AudioProcessorParameter* param)
 SimpleEQAudioProcessor::SimpleEQAudioProcessor()
     : juce::AudioProcessor(getBuses())
 {
-    parameters.add(*this);
 }
 
 void SimpleEQAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer,
                                                    juce::MidiBuffer& /*midiMessages*/)
 
 {
-    if (parameters.enable->get())
-        buffer.applyGain(parameters.gain->get());
-    else
-        buffer.clear();
 }
 
 juce::AudioProcessorEditor* SimpleEQAudioProcessor::createEditor()
