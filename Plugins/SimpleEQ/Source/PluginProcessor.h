@@ -2,10 +2,10 @@
 
 #include "Parameters.h"
 
-class NewPluginTemplateAudioProcessor : public juce::AudioProcessor
+class SimpleEQAudioProcessor : public juce::AudioProcessor
 {
 public:
-    NewPluginTemplateAudioProcessor();
+    SimpleEQAudioProcessor();
 
     void prepareToPlay(double /*sampleRate*/, int /*blockSize*/) override {}
     void releaseResources() override {}
@@ -31,8 +31,16 @@ public:
     void changeProgramName(int, const juce::String& /*newName*/) override {}
 
     void getStateInformation(juce::MemoryBlock& destData) override;
-
     void setStateInformation(const void* data, int sizeInBytes) override;
+
+    juce::AudioProcessorValueTreeState::ParameterLayout CreateParamLayout();
+
+    juce::AudioProcessorValueTreeState apvts {
+        *this,
+        nullptr,
+        "params",
+        CreateParamLayout()
+    };
 
 private:
     static BusesProperties getBuses();

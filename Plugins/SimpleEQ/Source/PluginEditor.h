@@ -5,7 +5,7 @@
 class NewPluginTemplateAudioProcessorEditor : public juce::AudioProcessorEditor
 {
 public:
-    explicit NewPluginTemplateAudioProcessorEditor(NewPluginTemplateAudioProcessor&);
+    explicit NewPluginTemplateAudioProcessorEditor(SimpleEQAudioProcessor&);
 
     void paint(juce::Graphics&) override;
     void resized() override {}
