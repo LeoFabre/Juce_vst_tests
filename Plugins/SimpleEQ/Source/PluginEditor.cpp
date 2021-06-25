@@ -2,7 +2,7 @@
 #include "PluginEditor.h"
 
 NewPluginTemplateAudioProcessorEditor::NewPluginTemplateAudioProcessorEditor(
-    SimpleEQAudioProcessor& p)
+    NewPluginTemplateAudioProcessor& p)
     : AudioProcessorEditor(&p)
 {
     setSize(400, 300);
