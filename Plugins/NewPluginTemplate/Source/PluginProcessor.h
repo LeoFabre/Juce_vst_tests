@@ -2,10 +2,10 @@
 
 #include "Parameters.h"
 
-class SimpleEQAudioProcessor : public juce::AudioProcessor
+class NewPluginTemplateAudioProcessor : public juce::AudioProcessor
 {
 public:
-    SimpleEQAudioProcessor();
+    NewPluginTemplateAudioProcessor();
 
     void prepareToPlay(double /*sampleRate*/, int /*blockSize*/) override {}
     void releaseResources() override {}

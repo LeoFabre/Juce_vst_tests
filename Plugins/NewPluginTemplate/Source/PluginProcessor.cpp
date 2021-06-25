@@ -12,13 +12,13 @@ juce::String getParamID(juce::AudioProcessorParameter* param)
     return param->getName(50);
 }
 
-SimpleEQAudioProcessor::SimpleEQAudioProcessor()
+NewPluginTemplateAudioProcessor::NewPluginTemplateAudioProcessor()
     : juce::AudioProcessor(getBuses())
 {
     parameters.add(*this);
 }
 
-void SimpleEQAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer,
+void NewPluginTemplateAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer,
                                                    juce::MidiBuffer& /*midiMessages*/)
 
 {
@@ -36,7 +36,7 @@ juce::AudioProcessorEditor* SimpleEQAudioProcessor::createEditor()
         return new NewPluginTemplateAudioProcessorEditor(*this);
 }
 
-void SimpleEQAudioProcessor::getStateInformation(juce::MemoryBlock& destData)
+void NewPluginTemplateAudioProcessor::getStateInformation(juce::MemoryBlock& destData)
 {
     //Serializes your parameters, and any other potential data into an XML:
 
@@ -56,7 +56,7 @@ void SimpleEQAudioProcessor::getStateInformation(juce::MemoryBlock& destData)
     copyXmlToBinary(*pluginPreset.createXml(), destData);
 }
 
-void SimpleEQAudioProcessor::setStateInformation(const void* data,
+void NewPluginTemplateAudioProcessor::setStateInformation(const void* data,
                                                           int sizeInBytes)
 {
     //Loads your parameters, and any other potential data from an XML:
@@ -80,7 +80,7 @@ void SimpleEQAudioProcessor::setStateInformation(const void* data,
     }
 }
 
-juce::AudioProcessor::BusesProperties SimpleEQAudioProcessor::getBuses()
+juce::AudioProcessor::BusesProperties NewPluginTemplateAudioProcessor::getBuses()
 {
     const auto stereo = juce::AudioChannelSet::stereo();
 
@@ -91,5 +91,5 @@ juce::AudioProcessor::BusesProperties SimpleEQAudioProcessor::getBuses()
 
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
-    return new SimpleEQAudioProcessor();
+    return new NewPluginTemplateAudioProcessor();
 }
