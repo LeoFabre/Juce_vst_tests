@@ -30,6 +30,10 @@ using Filter = juce::dsp::IIR::Filter<float>;
 using CutFilter = juce::dsp::ProcessorChain<Filter, Filter, Filter, Filter>;
 using MonoChain = juce::dsp::ProcessorChain<CutFilter, Filter, CutFilter>;
 
+using Coeffs = Filter::CoefficientsPtr;
+void updateCoefficients(Coeffs& old, const Coeffs& newCoeffs);
+Coeffs makePeakFilter(const ChainSettings& chainSettings, double sampleRate);
+
 enum ChainPositions
 {
     LowCut,
@@ -91,8 +95,6 @@ private:
     MonoChain leftChain, rightChain;
 
     void updatePeakFilter(const ChainSettings& chainSettings);
-    using Coeffs = Filter::CoefficientsPtr;
-    static void updateCoefficients(Coeffs& old, const Coeffs& newCoeffs);
 
     template <int Index, typename ChainType, typename CoefficientType>
     void update(ChainType& chain, const CoefficientType& coeffs)
