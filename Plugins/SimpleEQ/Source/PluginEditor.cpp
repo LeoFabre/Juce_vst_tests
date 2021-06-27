@@ -164,6 +164,17 @@ void SimpleEqAudioProcessorEditor::timerCallback()
         auto peakCoeffs = makePeakFilter(chainSettings, audioProcessor.getSampleRate());
         updateCoefficients(monoChain.get<ChainPositions::Peak>().coefficients,
                            peakCoeffs);
+        auto lowCutCoeffs =
+            makeLowCutFilter(chainSettings, audioProcessor.getSampleRate());
+        auto highCutCoeffs =
+            makeHighCutFilter(chainSettings, audioProcessor.getSampleRate());
+
+        updateCutFilter(monoChain.get<ChainPositions::LowCut>(),
+                        lowCutCoeffs,
+                        static_cast<const Slope>(chainSettings.lowCutSlope));
+        updateCutFilter(monoChain.get<ChainPositions::HighCut>(),
+                        highCutCoeffs,
+                        static_cast<const Slope>(chainSettings.highCutSlope));
         //        signal repaint
         repaint();
     }
