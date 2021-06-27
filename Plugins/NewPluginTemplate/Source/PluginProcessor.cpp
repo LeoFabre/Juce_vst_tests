@@ -28,7 +28,7 @@ void NewPluginTemplateAudioProcessor::processBlock(juce::AudioBuffer<float>& buf
         buffer.clear();
 }
 
-juce::AudioProcessorEditor* SimpleEQAudioProcessor::createEditor()
+juce::AudioProcessorEditor* NewPluginTemplateAudioProcessor::createEditor()
 {
     if (shouldUseGenericEditor)
         return new juce::GenericAudioProcessorEditor(*this);

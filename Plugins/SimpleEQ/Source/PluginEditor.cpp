@@ -1,14 +1,14 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 
-NewPluginTemplateAudioProcessorEditor::NewPluginTemplateAudioProcessorEditor(
+SimpleEQProcessorEditor::SimpleEQProcessorEditor(
     SimpleEQAudioProcessor& p)
     : AudioProcessorEditor(&p)
 {
     setSize(400, 300);
 }
 
-void NewPluginTemplateAudioProcessorEditor::paint(juce::Graphics& g)
+void SimpleEQProcessorEditor::paint(juce::Graphics& g)
 {
     g.fillAll(getLookAndFeel().findColour(juce::ResizableWindow::backgroundColourId));
 }

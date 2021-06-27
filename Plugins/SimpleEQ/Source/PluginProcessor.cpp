@@ -28,7 +28,7 @@ juce::AudioProcessorEditor* SimpleEQAudioProcessor::createEditor()
     if (shouldUseGenericEditor)
         return new juce::GenericAudioProcessorEditor(*this);
     else
-        return new NewPluginTemplateAudioProcessorEditor(*this);
+        return new SimpleEQProcessorEditor(*this);
 }
 
 void SimpleEQAudioProcessor::getStateInformation(juce::MemoryBlock& destData)
@@ -83,6 +83,7 @@ juce::AudioProcessor::BusesProperties SimpleEQAudioProcessor::getBuses()
         .withInput("Input", stereo, true)
         .withOutput("Output", stereo, true);
 }
+
 juce::AudioProcessorValueTreeState::ParameterLayout
     SimpleEQAudioProcessor::CreateParamLayout()
 {
@@ -144,7 +145,27 @@ juce::AudioProcessorValueTreeState::ParameterLayout
 
     return res;
 }
+void SimpleEQAudioProcessor::prepareToPlay(double sampleRate, int blockSize)
+{
+    juce::dsp::ProcessSpec spec;
+    spec.maximumBlockSize = blockSize;
+    spec.numChannels = 1;
+    spec.sampleRate = sampleRate;
+}
 
+ChainSettings getChainSettings(juce::AudioProcessorValueTreeState& apvts)
+{
+    ChainSettings res;
+
+    res.lowCutFreq = apvts.getRawParameterValue("LowCut Freq")->load();
+    res.highCutFreq = apvts.getRawParameterValue("HighCut Freq")->load();
+    res.peakFreq = apvts.getRawParameterValue("Peak Freq")->load();
+    res.peakGainDecibels = apvts.getRawParameterValue("Peak Gain")->load();
+    res.peakQuality = apvts.getRawParameterValue("Peak Quality")->load();
+    res.lowCutSlope = apvts.getRawParameterValue("LowCut Slope")->load();
+    res.highCutSlope = apvts.getRawParameterValue("HighCut Slope")->load();
+    return res;
+}
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
     return new SimpleEQAudioProcessor();
