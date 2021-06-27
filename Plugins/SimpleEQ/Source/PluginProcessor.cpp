@@ -102,13 +102,8 @@ void SimpleEQAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlo
     leftChain.prepare(spec);
     rightChain.prepare(spec);
     auto chainSettings = getChainSettings(apvts);
-    auto peakCoeffs = juce::dsp::IIR::Coefficients<float>::makePeakFilter(
-        sampleRate,
-        chainSettings.peakFreq,
-        chainSettings.peakQuality,
-        juce::Decibels::decibelsToGain(chainSettings.peakGainDecibels));
-    *leftChain.get<ChainPositions::Peak>().coefficients = *peakCoeffs;
-    *rightChain.get<ChainPositions::Peak>().coefficients = *peakCoeffs;
+
+    updatePeakFilter(chainSettings);
 
     auto cutCoeffs =
         juce::dsp::FilterDesign<float>::designIIRHighpassHighOrderButterworthMethod(
@@ -232,14 +227,8 @@ void SimpleEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
         buffer.clear (i, 0, buffer.getNumSamples());
 
     auto chainSettings = getChainSettings(apvts);
-    auto peakCoeffs = juce::dsp::IIR::Coefficients<float>::makePeakFilter(
-        getSampleRate(),
-        chainSettings.peakFreq,
-        chainSettings.peakQuality,
-        juce::Decibels::decibelsToGain(chainSettings.peakGainDecibels));
-    *leftChain.get<ChainPositions::Peak>().coefficients = *peakCoeffs;
-    *rightChain.get<ChainPositions::Peak>().coefficients = *peakCoeffs;
 
+    updatePeakFilter(chainSettings);
 
     auto cutCoeffs =
         juce::dsp::FilterDesign<float>::designIIRHighpassHighOrderButterworthMethod(
@@ -354,6 +343,7 @@ void SimpleEQAudioProcessor::setStateInformation (const void* data, int sizeInBy
     // You should use this method to restore your parameters from this memory block,
     // whose contents will have been created by the getStateInformation() call.
 }
+
 juce::AudioProcessorValueTreeState::ParameterLayout
     SimpleEQAudioProcessor::createParameterLayout()
 {
@@ -401,6 +391,21 @@ juce::AudioProcessorValueTreeState::ParameterLayout
     layout.add(std::make_unique<juce::AudioParameterChoice>(
         "HighCut Slope", "HighCut Slope", stringArr, 0));
     return layout;
+}
+
+void SimpleEQAudioProcessor::updatePeakFilter(const ChainSettings& chainSettings)
+{
+    auto peakCoeffs = juce::dsp::IIR::Coefficients<float>::makePeakFilter(
+        getSampleRate(),
+        chainSettings.peakFreq,
+        chainSettings.peakQuality,
+        juce::Decibels::decibelsToGain(chainSettings.peakGainDecibels));
+    updateCoefficients(leftChain.get<ChainPositions::Peak>().coefficients, peakCoeffs);
+    updateCoefficients(rightChain.get<ChainPositions::Peak>().coefficients, peakCoeffs);
+}
+void SimpleEQAudioProcessor::updateCoefficients(Coeffs& old, const Coeffs& newCoeffs)
+{
+    *old = *newCoeffs;
 }
 
 //==============================================================================
