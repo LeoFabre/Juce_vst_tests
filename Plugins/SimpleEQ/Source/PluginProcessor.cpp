@@ -95,25 +95,38 @@ void SimpleEQAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlo
 {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
+
     juce::dsp::ProcessSpec spec;
+
     spec.maximumBlockSize = samplesPerBlock;
+
     spec.numChannels = 1;
+
     spec.sampleRate = sampleRate;
+
     leftChain.prepare(spec);
     rightChain.prepare(spec);
+
     auto chainSettings = getChainSettings(apvts);
 
     updatePeakFilter(chainSettings);
 
-    auto cutCoeffs =
+    auto lowCutCoeffs =
         juce::dsp::FilterDesign<float>::designIIRHighpassHighOrderButterworthMethod(
             chainSettings.lowCutFreq, sampleRate, 2 * (chainSettings.lowCutSlope + 1));
-
     auto& leftLowCut = leftChain.get<ChainPositions::LowCut>();
+    updateCutFilter(leftLowCut, lowCutCoeffs, static_cast<Slope>(chainSettings.lowCutSlope));
     auto& rightLowCut = rightChain.get<ChainPositions::LowCut>();
+    updateCutFilter(rightLowCut, lowCutCoeffs, static_cast<Slope>(chainSettings.lowCutSlope));
 
-    updateCutFilter(leftLowCut, cutCoeffs, static_cast<Slope>(chainSettings.lowCutSlope));
-    updateCutFilter(rightLowCut, cutCoeffs, static_cast<Slope>(chainSettings.lowCutSlope));
+    auto highCutCoeffs =
+        juce::dsp::FilterDesign<float>::designIIRLowpassHighOrderButterworthMethod(
+            chainSettings.highCutFreq, sampleRate, 2 * (chainSettings.highCutSlope + 1));
+    auto& leftHighCut = leftChain.get<ChainPositions::HighCut>();
+    auto& rightHighCut = rightChain.get<ChainPositions::HighCut>();
+
+    updateCutFilter(leftHighCut, highCutCoeffs, static_cast<Slope>(chainSettings.highCutSlope));
+    updateCutFilter(rightHighCut, highCutCoeffs, static_cast<Slope>(chainSettings.highCutSlope));
 }
 
 void SimpleEQAudioProcessor::releaseResources()
@@ -161,15 +174,21 @@ void SimpleEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
 
     updatePeakFilter(chainSettings);
 
-    auto cutCoeffs =
+    auto lowCutCoeffs =
         juce::dsp::FilterDesign<float>::designIIRHighpassHighOrderButterworthMethod(
             chainSettings.lowCutFreq, getSampleRate(), 2 * (chainSettings.lowCutSlope + 1));
-
     auto& leftLowCut = leftChain.get<ChainPositions::LowCut>();
-    updateCutFilter(leftLowCut, cutCoeffs, static_cast<Slope>(chainSettings.lowCutSlope));
-
+    updateCutFilter(leftLowCut, lowCutCoeffs, static_cast<Slope>(chainSettings.lowCutSlope));
     auto& rightLowCut = rightChain.get<ChainPositions::LowCut>();
-    updateCutFilter(rightLowCut, cutCoeffs, static_cast<Slope>(chainSettings.highCutSlope));
+    updateCutFilter(rightLowCut, lowCutCoeffs, static_cast<Slope>(chainSettings.lowCutSlope));
+
+    auto highCutCoeffs =
+        juce::dsp::FilterDesign<float>::designIIRLowpassHighOrderButterworthMethod(
+            chainSettings.highCutFreq, getSampleRate(), 2 * (chainSettings.highCutSlope + 1));
+    auto& leftHighCut = leftChain.get<ChainPositions::HighCut>();
+    updateCutFilter(leftHighCut, highCutCoeffs, static_cast<Slope>(chainSettings.highCutSlope));
+    auto& rightHighCut = rightChain.get<ChainPositions::HighCut>();
+    updateCutFilter(rightHighCut, highCutCoeffs, static_cast<Slope>(chainSettings.highCutSlope));
 
     juce::dsp::AudioBlock<float> block(buffer);
     auto leftBlock = block.getSingleChannelBlock(0);
@@ -272,27 +291,23 @@ void SimpleEQAudioProcessor::updateCoefficients(Coeffs& old, const Coeffs& newCo
 template <typename ChainType, typename CoefficientType>
 void SimpleEQAudioProcessor::updateCutFilter(ChainType& chain,
                                              const CoefficientType& coeffs,
-                                             const Slope& lowCutSlope)
+                                             const Slope& slope)
 {
     chain.template setBypassed<0>(true);
     chain.template setBypassed<1>(true);
     chain.template setBypassed<2>(true);
     chain.template setBypassed<3>(true);
 
-    switch (lowCutSlope)
+    switch (slope)
     {
         case Slope_48:
             update<3>(chain, coeffs);
-            break;
         case Slope_36:
             update<2>(chain, coeffs);
-            break;
         case Slope_24:
             update<1>(chain, coeffs);
-            break;
         case Slope_12:
             update<0>(chain, coeffs);
-            break;
     }
 }
 
