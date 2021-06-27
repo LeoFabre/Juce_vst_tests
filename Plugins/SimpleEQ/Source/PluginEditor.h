@@ -13,11 +13,11 @@
 //==============================================================================
 /**
 */
-class NewProjectAudioProcessorEditor  : public juce::AudioProcessorEditor
+class SimpleEqAudioProcessorEditor : public juce::AudioProcessorEditor
 {
 public:
-    NewProjectAudioProcessorEditor (SimpleEQAudioProcessor&);
-    ~NewProjectAudioProcessorEditor() override;
+    SimpleEqAudioProcessorEditor(SimpleEQAudioProcessor&);
+    ~SimpleEqAudioProcessorEditor() override;
 
     //==============================================================================
     void paint (juce::Graphics&) override;
@@ -28,5 +28,5 @@ private:
     // access the processor object that created it.
     SimpleEQAudioProcessor& audioProcessor;
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (NewProjectAudioProcessorEditor)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SimpleEqAudioProcessorEditor)
 };
