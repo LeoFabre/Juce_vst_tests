@@ -270,49 +270,30 @@ void SimpleEQAudioProcessor::updateCoefficients(Coeffs& old, const Coeffs& newCo
     *old = *newCoeffs;
 }
 template <typename ChainType, typename CoefficientType>
-void SimpleEQAudioProcessor::updateCutFilter(ChainType& leftLowCut,
-                                             const CoefficientType& cutCoeffs,
-//                                             const ChainSettings& chainSettings)
+void SimpleEQAudioProcessor::updateCutFilter(ChainType& chain,
+                                             const CoefficientType& coeffs,
                                              const Slope& lowCutSlope)
 {
+    chain.template setBypassed<0>(true);
+    chain.template setBypassed<1>(true);
+    chain.template setBypassed<2>(true);
+    chain.template setBypassed<3>(true);
 
-    leftLowCut.template setBypassed<0>(true);
-    leftLowCut.template setBypassed<1>(true);
-    leftLowCut.template setBypassed<2>(true);
-    leftLowCut.template setBypassed<3>(true);
-//    switch (chainSettings.lowCutSlope)
     switch (lowCutSlope)
     {
-        case Slope_12:
-            *leftLowCut.template get<0>().coefficients = *cutCoeffs[0];
-            leftLowCut.template setBypassed<0>(false);
-            break;
-        case Slope_24:
-            *leftLowCut.template get<0>().coefficients = *cutCoeffs[0];
-            leftLowCut.template setBypassed<0>(false);
-            *leftLowCut.template get<1>().coefficients = *cutCoeffs[1];
-            leftLowCut.template setBypassed<1>(false);
+        case Slope_48:
+            update<3>(chain, coeffs);
             break;
         case Slope_36:
-            *leftLowCut.template get<0>().coefficients = *cutCoeffs[0];
-            leftLowCut.template setBypassed<0>(false);
-            *leftLowCut.template get<1>().coefficients = *cutCoeffs[1];
-            leftLowCut.template setBypassed<1>(false);
-            *leftLowCut.template get<2>().coefficients = *cutCoeffs[2];
-            leftLowCut.template setBypassed<2>(false);
+            update<2>(chain, coeffs);
             break;
-        case Slope_48:
-            *leftLowCut.template get<0>().coefficients = *cutCoeffs[0];
-            leftLowCut.template setBypassed<0>(false);
-            *leftLowCut.template get<1>().coefficients = *cutCoeffs[1];
-            leftLowCut.template setBypassed<1>(false);
-            *leftLowCut.template get<2>().coefficients = *cutCoeffs[2];
-            leftLowCut.template setBypassed<2>(false);
-            *leftLowCut.template get<3>().coefficients = *cutCoeffs[3];
-            leftLowCut.template setBypassed<3>(false);
+        case Slope_24:
+            update<1>(chain, coeffs);
+            break;
+        case Slope_12:
+            update<0>(chain, coeffs);
             break;
     }
-
 }
 
 //==============================================================================
