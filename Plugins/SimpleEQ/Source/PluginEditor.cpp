@@ -130,6 +130,14 @@ ResponseCurveComponent::~ResponseCurveComponent()
 SimpleEqAudioProcessorEditor::SimpleEqAudioProcessorEditor(SimpleEQAudioProcessor& p)
     : AudioProcessorEditor(&p)
     , audioProcessor(p)
+    , peakFreqSlider(*audioProcessor.apvts.getParameter("Peak Freq"), "Hz")
+    , peakGainSlider(*audioProcessor.apvts.getParameter("Peak Gain"), "dB")
+    , peakQualitySlider(*audioProcessor.apvts.getParameter("Peak Quality"), "")
+    , LowCutFreqSlider(*audioProcessor.apvts.getParameter("LowCut Freq"), "Hz")
+    , HighCutFreqSlider(*audioProcessor.apvts.getParameter("HighCut Freq"), "Hz")
+    , LowCutSlopeSlider(*audioProcessor.apvts.getParameter("LowCut Slope"), "dB/Oct")
+    , HighCutSlopeSlider(*audioProcessor.apvts.getParameter("HighCut Slope"), "dB/Oct")
+
     , peakFreqSliderAttachment(audioProcessor.apvts, "Peak Freq", peakFreqSlider)
     , peakGainSliderAttachment(audioProcessor.apvts, "Peak Gain", peakGainSlider)
     , peakQualitySliderAttachment(audioProcessor.apvts, "Peak Quality", peakQualitySlider)
@@ -196,4 +204,15 @@ std::vector<juce::Component*> SimpleEqAudioProcessorEditor::getComps()
         &HighCutSlopeSlider,
         &responseCurveComponent
     };
+}
+void LookAndFeel::drawRotarySlider(juce::Graphics& graphics,
+                                   int x,
+                                   int y,
+                                   int width,
+                                   int height,
+                                   float sliderPosProportional,
+                                   float rotaryStartAngle,
+                                   float rotaryEndAngle,
+                                   juce::Slider& slider)
+{
 }
