@@ -1,57 +1,59 @@
+/*
+  ==============================================================================
+
+    This file contains the basic framework code for a JUCE plugin processor.
+
+  ==============================================================================
+*/
+
 #pragma once
 
-#include "Parameters.h"
-#include "juce_dsp/juce_dsp.h"
-struct ChainSettings
-{
-    float peakFreq {0}, peakGainDecibels {0}, peakQuality {0};
-    float lowCutFreq {0}, highCutFreq {0};
-    int lowCutSlope {0}, highCutSlope {0};
-};
+#include "juce_audio_processors/juce_audio_processors.h"
 
-ChainSettings getChainSettings(juce::AudioProcessorValueTreeState& apvts);
-
+//==============================================================================
+/**
+*/
 class SimpleEQAudioProcessor : public juce::AudioProcessor
 {
 public:
+    //==============================================================================
     SimpleEQAudioProcessor();
+    ~SimpleEQAudioProcessor() override;
 
-    void prepareToPlay(double sampleRate, int blockSize) override;
-    void releaseResources() override {}
+    //==============================================================================
+    void prepareToPlay (double sampleRate, int samplesPerBlock) override;
+    void releaseResources() override;
 
-    bool isBusesLayoutSupported(const BusesLayout&) const override { return true; }
+   #ifndef JucePlugin_PreferredChannelConfigurations
+    bool isBusesLayoutSupported (const BusesLayout& layouts) const override;
+   #endif
 
-    void processBlock(juce::AudioBuffer<float>&, juce::MidiBuffer&) override;
+    void processBlock (juce::AudioBuffer<float>&, juce::MidiBuffer&) override;
 
+    //==============================================================================
     juce::AudioProcessorEditor* createEditor() override;
-    bool hasEditor() const override { return true; }
+    bool hasEditor() const override;
 
-    const juce::String getName() const override { return JucePlugin_Name; }
+    //==============================================================================
+    const juce::String getName() const override;
 
-    bool acceptsMidi() const override { return true; }
-    bool producesMidi() const override { return false; }
-    bool isMidiEffect() const override { return false; }
-    double getTailLengthSeconds() const override { return 0.0; }
+    bool acceptsMidi() const override;
+    bool producesMidi() const override;
+    bool isMidiEffect() const override;
+    double getTailLengthSeconds() const override;
 
-    int getNumPrograms() override { return 1; }
-    int getCurrentProgram() override { return 0; }
-    void setCurrentProgram(int) override {}
-    const juce::String getProgramName(int) override { return juce::String(); }
-    void changeProgramName(int, const juce::String& /*newName*/) override {}
+    //==============================================================================
+    int getNumPrograms() override;
+    int getCurrentProgram() override;
+    void setCurrentProgram (int index) override;
+    const juce::String getProgramName (int index) override;
+    void changeProgramName (int index, const juce::String& newName) override;
 
-    void getStateInformation(juce::MemoryBlock& destData) override;
-    void setStateInformation(const void* data, int sizeInBytes) override;
-
-    juce::AudioProcessorValueTreeState::ParameterLayout CreateParamLayout();
-
-    juce::AudioProcessorValueTreeState apvts {
-        *this,
-        nullptr,
-        "params",
-        CreateParamLayout()
-    };
+    //==============================================================================
+    void getStateInformation (juce::MemoryBlock& destData) override;
+    void setStateInformation (const void* data, int sizeInBytes) override;
 
 private:
-    static BusesProperties getBuses();
-
+    //==============================================================================
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SimpleEQAudioProcessor)
 };
