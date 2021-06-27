@@ -10,41 +10,48 @@
 
 #include "PluginProcessor.h"
 
-struct CustomRotarySlider : juce::Slider {
-    CustomRotarySlider() : juce::Slider(juce::Slider::SliderStyle::RotaryVerticalDrag,
-                                        juce::Slider::TextEntryBoxPosition::NoTextBox)
+struct CustomRotarySlider : juce::Slider
+{
+    CustomRotarySlider()
+        : juce::Slider(juce::Slider::SliderStyle::RotaryVerticalDrag,
+                       juce::Slider::TextEntryBoxPosition::NoTextBox)
     {
-
     }
 };
 
+struct ResponseCurveComponent: juce::Component
+                                , juce::AudioProcessorParameter::Listener
+                                , juce::Timer
+{
+    ResponseCurveComponent(SimpleEQAudioProcessor& p);
+    ~ResponseCurveComponent();
+    void paint(juce::Graphics& g) override;
+
+    void parameterValueChanged(int parameterIndex, float newValue) override;
+    void parameterGestureChanged(int parameterIndex, bool gestureIsStarting) override {};
+    void timerCallback() override;
+    SimpleEQAudioProcessor& audioProcessor;
+    juce::Atomic<bool> parametersChanged {false};
+    MonoChain monoChain;
+};
 //==============================================================================
 /**
 */
 class SimpleEqAudioProcessorEditor
-    : public juce::AudioProcessorEditor,
-      juce::AudioProcessorParameter::Listener,
-      juce::Timer
+    : public juce::AudioProcessorEditor
 {
 public:
     SimpleEqAudioProcessorEditor(SimpleEQAudioProcessor&);
     ~SimpleEqAudioProcessorEditor() override;
 
     //==============================================================================
-    void paint (juce::Graphics&) override;
+    void paint(juce::Graphics&) override;
     void resized() override;
-
-private:
-    void parameterValueChanged(int parameterIndex, float newValue) override;
-    void parameterGestureChanged(int parameterIndex, bool gestureIsStarting) override {};
-    void timerCallback() override;
 
 private:
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
     SimpleEQAudioProcessor& audioProcessor;
-
-    juce::Atomic<bool> parametersChanged {false};
 
     CustomRotarySlider peakFreqSlider;
     CustomRotarySlider peakGainSlider;
@@ -67,6 +74,6 @@ private:
 
     std::vector<juce::Component*> getComps();
 
-    MonoChain monoChain;
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SimpleEqAudioProcessorEditor)
+    ResponseCurveComponent responseCurveComponent;
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SimpleEqAudioProcessorEditor)
 };
