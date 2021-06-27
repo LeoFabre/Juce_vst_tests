@@ -42,6 +42,35 @@ enum ChainPositions
 };
 ChainSettings getChainSettings(juce::AudioProcessorValueTreeState& apvts);
 
+template <int Index, typename ChainType, typename CoefficientType>
+void update(ChainType& chain, const CoefficientType& coeffs)
+{
+    updateCoefficients(chain.template get<Index>().coefficients, coeffs[Index]);
+    chain.template setBypassed<Index>(false);
+}
+
+template <typename ChainType, typename CoefficientType>
+void updateCutFilter(ChainType& chain,
+    const CoefficientType& coeffs,
+    const Slope& slope);
+
+inline auto makeLowCutFilter(const ChainSettings& chainSettings, double sampleRate)
+{
+    return juce::dsp::FilterDesign<float>::designIIRHighpassHighOrderButterworthMethod(
+        chainSettings.lowCutFreq,
+        sampleRate,
+        2 * (chainSettings.lowCutSlope + 1)
+        );
+}
+
+inline auto makeHighCutFilter(const ChainSettings& chainSettings, double sampleRate)
+{
+    return juce::dsp::FilterDesign<float>::designIIRLowpassHighOrderButterworthMethod(
+        chainSettings.highCutFreq,
+        sampleRate,
+        2 * (chainSettings.highCutSlope + 1)
+        );
+}
 //==============================================================================
 /**
 */
@@ -96,17 +125,6 @@ private:
 
     void updatePeakFilter(const ChainSettings& chainSettings);
 
-    template <int Index, typename ChainType, typename CoefficientType>
-    void update(ChainType& chain, const CoefficientType& coeffs)
-    {
-        updateCoefficients(chain.template get<Index>().coefficients, coeffs[Index]);
-        chain.template setBypassed<Index>(false);
-    }
-
-    template <typename ChainType, typename CoefficientType>
-    void updateCutFilter(ChainType& chain,
-                         const CoefficientType& coeffs,
-                         const Slope& slope);
 
     void updateLowCutFilters(const ChainSettings& chainSettings);
     void updateHighCutFilters(const ChainSettings& chainSettings);
