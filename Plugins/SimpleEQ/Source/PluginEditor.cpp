@@ -29,8 +29,7 @@ SimpleEqAudioProcessorEditor::SimpleEqAudioProcessorEditor(SimpleEQAudioProcesso
     , LowCutFreqSliderAttachment(audioProcessor.apvts, "LowCut Freq", LowCutFreqSlider)
     , highCutFreqSliderAttachment(audioProcessor.apvts, "HighCut Freq", HighCutFreqSlider)
     , LowCutSlopeSliderAttachment(audioProcessor.apvts, "LowCut Slope", LowCutSlopeSlider)
-    , HighCutSlopeSliderAttachment(
-          audioProcessor.apvts, "HighCut Slope", HighCutSlopeSlider),
+    , HighCutSlopeSliderAttachment(audioProcessor.apvts, "HighCut Slope", HighCutSlopeSlider),
     responseCurveComponent(audioProcessor)
 {
     // Make sure that before the constructor has finished, you've set the
