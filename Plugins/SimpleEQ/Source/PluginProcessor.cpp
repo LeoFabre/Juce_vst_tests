@@ -99,9 +99,7 @@ void SimpleEQAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlo
     juce::dsp::ProcessSpec spec;
 
     spec.maximumBlockSize = samplesPerBlock;
-
-    spec.numChannels = 1;
-
+    spec.numChannels = getTotalNumOutputChannels();
     spec.sampleRate = sampleRate;
 
     leftChain.prepare(spec);
