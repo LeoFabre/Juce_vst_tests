@@ -3,39 +3,28 @@
 //
 
 #include "PluginEditor.h"
-#include "PluginProcessor.h"
-#include "ResponseCurveComponent.h"
-void ResponseCurveComponent::parameterValueChanged(int parameterIndex,
-    float newValue)
+
+ResponseCurveComponent::ResponseCurveComponent(SimpleEQAudioProcessor& p)
+    :audioProcessor(p)
 {
-    parametersChanged.set(true);
-}
-void ResponseCurveComponent::timerCallback()
-{
-    if (parametersChanged.compareAndSetBool(false, true))
+    const auto& params = audioProcessor.getParameters();
+    for (auto param: params)
     {
-        updateChain();
-        repaint();
+        param->addListener(this);
+    }
+    updateChain();
+    startTimer(10);
+}
+
+ResponseCurveComponent::~ResponseCurveComponent()
+{
+    const auto& params = audioProcessor.getParameters();
+    for (auto param: params)
+    {
+        param->removeListener(this);
     }
 }
-void ResponseCurveComponent::updateChain()
-{
-    auto chainSettings = getChainSettings(audioProcessor.apvts);
-    auto peakCoeffs = makePeakFilter(chainSettings, audioProcessor.getSampleRate());
-    updateCoefficients(monoChain.get<Peak>().coefficients,
-        peakCoeffs);
-    auto lowCutCoeffs =
-        makeLowCutFilter(chainSettings, audioProcessor.getSampleRate());
-    auto highCutCoeffs =
-        makeHighCutFilter(chainSettings, audioProcessor.getSampleRate());
 
-    updateCutFilter(monoChain.get<LowCut>(),
-        lowCutCoeffs,
-        static_cast<const Slope>(chainSettings.lowCutSlope));
-    updateCutFilter(monoChain.get<HighCut>(),
-        highCutCoeffs,
-        static_cast<const Slope>(chainSettings.highCutSlope));
-}
 void ResponseCurveComponent::paint(juce::Graphics& g)
 {
     using namespace juce;
@@ -104,18 +93,19 @@ void ResponseCurveComponent::paint(juce::Graphics& g)
     g.setColour(Colours::white);
     g.strokePath(responseCurve, PathStrokeType(2.f));
 }
+
 void ResponseCurveComponent::resized()
 {
     using namespace juce;
     background = Image(Image::PixelFormat::RGB, getWidth(), getHeight(), true);
     Graphics g(background);
     Array<std::tuple<float, bool>> freqs
-    {
-        std::make_tuple(20, true), std::make_tuple(30, false), std::make_tuple(40, false), std::make_tuple(50, true), std::make_tuple(100, true),
-        std::make_tuple(200, true), std::make_tuple(300, false), std::make_tuple(400, false), std::make_tuple(500, true), std::make_tuple(1000, true),
-        std::make_tuple(2000, true), std::make_tuple(3000, false), std::make_tuple(4000, false), std::make_tuple(5000, true), std::make_tuple(10000, true),
-        std::make_tuple(20000, true)
-    };
+        {
+            std::make_tuple(20, true), std::make_tuple(30, false), std::make_tuple(40, false), std::make_tuple(50, true), std::make_tuple(100, true),
+            std::make_tuple(200, true), std::make_tuple(300, false), std::make_tuple(400, false), std::make_tuple(500, true), std::make_tuple(1000, true),
+            std::make_tuple(2000, true), std::make_tuple(3000, false), std::make_tuple(4000, false), std::make_tuple(5000, true), std::make_tuple(10000, true),
+            std::make_tuple(20000, true)
+        };
     auto renderArea = getAnalysisArea();
     auto left = renderArea.getX();
     auto right = renderArea.getRight();
@@ -195,6 +185,41 @@ void ResponseCurveComponent::resized()
         g.drawFittedText(str, r, Justification::centred, 1);
     }
 }
+
+void ResponseCurveComponent::parameterValueChanged(int parameterIndex,
+    float newValue)
+{
+    parametersChanged.set(true);
+}
+
+void ResponseCurveComponent::timerCallback()
+{
+    if (parametersChanged.compareAndSetBool(false, true))
+    {
+        updateChain();
+        repaint();
+    }
+}
+
+void ResponseCurveComponent::updateChain()
+{
+    auto chainSettings = getChainSettings(audioProcessor.apvts);
+    auto peakCoeffs = makePeakFilter(chainSettings, audioProcessor.getSampleRate());
+    updateCoefficients(monoChain.get<Peak>().coefficients,
+        peakCoeffs);
+    auto lowCutCoeffs =
+        makeLowCutFilter(chainSettings, audioProcessor.getSampleRate());
+    auto highCutCoeffs =
+        makeHighCutFilter(chainSettings, audioProcessor.getSampleRate());
+
+    updateCutFilter(monoChain.get<LowCut>(),
+        lowCutCoeffs,
+        static_cast<const Slope>(chainSettings.lowCutSlope));
+    updateCutFilter(monoChain.get<HighCut>(),
+        highCutCoeffs,
+        static_cast<const Slope>(chainSettings.highCutSlope));
+}
+
 juce::Rectangle<int> ResponseCurveComponent::getRenderArea()
 {
     auto bounds = getLocalBounds();
@@ -212,23 +237,4 @@ juce::Rectangle<int> ResponseCurveComponent::getAnalysisArea()
     bounds.removeFromTop(4);
     bounds.removeFromBottom(4);
     return bounds;
-}
-ResponseCurveComponent::ResponseCurveComponent(SimpleEQAudioProcessor& p)
-    :audioProcessor(p)
-{
-    const auto& params = audioProcessor.getParameters();
-    for (auto param: params)
-    {
-        param->addListener(this);
-    }
-    updateChain();
-    startTimer(10);
-}
-ResponseCurveComponent::~ResponseCurveComponent()
-{
-    const auto& params = audioProcessor.getParameters();
-    for (auto param: params)
-    {
-        param->removeListener(this);
-    }
 }
