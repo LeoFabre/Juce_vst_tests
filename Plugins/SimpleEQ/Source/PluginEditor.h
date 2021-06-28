@@ -9,6 +9,8 @@
 #pragma once
 
 #include "PluginProcessor.h"
+#include "Fifo.h"
+#include "SingleChannelSampleFifo.h"
 
 enum FFTOrder
 {
