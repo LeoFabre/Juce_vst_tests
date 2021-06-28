@@ -3,8 +3,6 @@
 //
 
 #include "PluginEditor.h"
-#include "PluginProcessor.h"
-#include "LookAndFeel.h"
 void LookAndFeel::drawRotarySlider(juce::Graphics& g,
                                    int x,
                                    int y,

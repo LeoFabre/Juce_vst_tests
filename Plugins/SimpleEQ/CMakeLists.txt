@@ -22,6 +22,8 @@ target_sources(${BaseTargetName} PRIVATE
         Source/PluginProcessor.cpp
         Source/PluginEditor.cpp
         Source/ResponseCurveComponent.cpp
+        Source/LookAndFeel.cpp
+        Source/RotarySliderWithLabels.cpp
         )
 
 target_compile_definitions(${BaseTargetName}
