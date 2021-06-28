@@ -130,6 +130,7 @@ ResponseCurveComponent::~ResponseCurveComponent()
 SimpleEqAudioProcessorEditor::SimpleEqAudioProcessorEditor(SimpleEQAudioProcessor& p)
     : AudioProcessorEditor(&p)
     , audioProcessor(p)
+    //Sliders
     , peakFreqSlider(*audioProcessor.apvts.getParameter("Peak Freq"), "Hz")
     , peakGainSlider(*audioProcessor.apvts.getParameter("Peak Gain"), "dB")
     , peakQualitySlider(*audioProcessor.apvts.getParameter("Peak Quality"), "")
@@ -137,7 +138,7 @@ SimpleEqAudioProcessorEditor::SimpleEqAudioProcessorEditor(SimpleEQAudioProcesso
     , HighCutFreqSlider(*audioProcessor.apvts.getParameter("HighCut Freq"), "Hz")
     , LowCutSlopeSlider(*audioProcessor.apvts.getParameter("LowCut Slope"), "dB/Oct")
     , HighCutSlopeSlider(*audioProcessor.apvts.getParameter("HighCut Slope"), "dB/Oct")
-
+    //Attachments
     , peakFreqSliderAttachment(audioProcessor.apvts, "Peak Freq", peakFreqSlider)
     , peakGainSliderAttachment(audioProcessor.apvts, "Peak Gain", peakGainSlider)
     , peakQualitySliderAttachment(audioProcessor.apvts, "Peak Quality", peakQualitySlider)
@@ -150,6 +151,8 @@ SimpleEqAudioProcessorEditor::SimpleEqAudioProcessorEditor(SimpleEQAudioProcesso
 {
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
+    peakFreqSlider.labels.add({0.f, "20Hz"});
+    peakFreqSlider.labels.add({0.f, "20KHz"});
     for (auto& comp: getComps())
     {
         addAndMakeVisible(comp);
@@ -279,6 +282,30 @@ void RotarySliderWithLabels::paint(juce::Graphics& g)
                                       startAng,
                                       endAng,
                                       *this);
+    auto center = sliderBounds.toFloat().getCentre();
+    auto radius = sliderBounds.getWidth() * 0.5f;
+    g.setColour({0u, 172u, 1u});
+    g.setFont(getTextHeight());
+    auto numChoices = labels.size();
+    for (int i = 0; i < numChoices; ++i)
+    {
+        auto pos = labels[i].pos;
+        jassert(0.f <= pos);
+        jassert(pos <= 1.f);
+        auto ang = jmap(pos,
+            0.f,
+            1.f,
+            startAng,
+            endAng);
+        auto c = center.getPointOnCircumference(radius + getTextHeight() * 0.5f + 1, ang);
+
+        Rectangle<float> r;
+        auto str = labels[i].label;
+        r.setSize(g.getCurrentFont().getStringWidth(str), getTextHeight());
+        r.setCentre(c);
+        r.setY(r.getY() + getTextHeight());
+        g.drawFittedText(str, r.toNearestInt(), juce::Justification::centred, 1)
+    }
 }
 juce::Rectangle<int> RotarySliderWithLabels::getSliderBounds() const
 {
