@@ -10,46 +10,7 @@
 
 #include "PluginProcessor.h"
 #include "ResponseCurveComponent.h"
-
-struct LookAndFeel : juce::LookAndFeel_V4
-{
-    void drawRotarySlider(juce::Graphics& graphics,
-                          int x,
-                          int y,
-                          int width,
-                          int height,
-                          float sliderPosProportional,
-                          float rotaryStartAngle,
-                          float rotaryEndAngle,
-                          juce::Slider& slider) override;
-};
-
-struct RotarySliderWithLabels : juce::Slider
-{
-    RotarySliderWithLabels(juce::RangedAudioParameter& rap, const juce::String& unitSuffix)
-        : juce::Slider(juce::Slider::SliderStyle::RotaryVerticalDrag,
-                       juce::Slider::TextEntryBoxPosition::NoTextBox),
-        param(&rap),
-        suffix(unitSuffix)
-    {
-        setLookAndFeel(&lnf);
-    }
-    ~RotarySliderWithLabels() { setLookAndFeel(nullptr); }
-    struct LabelPos{
-        float pos;
-        juce::String label;
-    };
-    juce::Array<LabelPos> labels;
-    void paint(juce::Graphics& graphics) override;
-    juce::Rectangle<int> getSliderBounds() const;
-    int getTextHeight() const { return 14; }
-    juce::String getDisplayString() const;
-
-private:
-    juce::RangedAudioParameter* param;
-    juce::String suffix;
-    LookAndFeel lnf;
-};
+#include "RotarySliderWithLabels.h"
 
 //==============================================================================
 /**
@@ -93,4 +54,5 @@ private:
 
     ResponseCurveComponent responseCurveComponent;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SimpleEqAudioProcessorEditor)
+    void addLabels();
 };
