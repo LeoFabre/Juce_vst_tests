@@ -110,12 +110,12 @@ void ResponseCurveComponent::resized()
     using namespace juce;
     background = Image(Image::PixelFormat::RGB, getWidth(), getHeight(), true);
     Graphics g(background);
-    Array<float> freqs
+    Array<std::tuple<float, bool>> freqs
     {
-        20,30,40,50,100,
-        200,300,400,500,1000,
-        2000,3000,4000,5000,10000,
-        20000
+        std::make_tuple(20, true), std::make_tuple(30, false), std::make_tuple(40, false), std::make_tuple(50, true), std::make_tuple(100, true),
+        std::make_tuple(200, true), std::make_tuple(300, false), std::make_tuple(400, false), std::make_tuple(500, true), std::make_tuple(1000, true),
+        std::make_tuple(2000, true), std::make_tuple(3000, false), std::make_tuple(4000, false), std::make_tuple(5000, true), std::make_tuple(10000, true),
+        std::make_tuple(20000, true)
     };
     auto renderArea = getAnalysisArea();
     auto left = renderArea.getX();
@@ -124,8 +124,9 @@ void ResponseCurveComponent::resized()
     auto bottom = renderArea.getBottom();
     auto width = renderArea.getWidth();
     Array<float> xs;
-    for (auto f : freqs)
+    for (auto tup : freqs)
     {
+        auto f = std::get<0>(tup);
         auto normX = mapFromLog10(f, 20.f, 20000.f);
         xs.add(left + width * normX);
     }
@@ -141,6 +142,33 @@ void ResponseCurveComponent::resized()
 //        g.drawHorizontalLine(y, 0, getWidth());
         g.setColour(gDb == 0.f ? Colour(0u, 172u, 1u) : Colours::darkgrey);
         g.drawHorizontalLine(y, left, right);
+    }
+    g.setColour(Colours::lightgrey);
+    const int fontHeight = 10;
+    g.setFont(fontHeight);
+    for (int i = 0; i < freqs.size(); ++i)
+    {
+        auto f = std::get<0>(freqs[i]);
+        auto x = xs[i];
+        bool addK = false;
+        String str;
+        if (f > 999.f) {
+            addK = true;
+            f /= 1000.f;
+        }
+        str << f;
+        if (addK) {
+            str << "k";
+        }
+        str << "Hz";
+        auto textWidth = g.getCurrentFont().getStringWidth(str);
+        Rectangle<int> r;
+        r.setSize(textWidth, fontHeight);
+        r.setCentre(x, 0);
+        r.setY(1);
+        if (std::get<1>(freqs[i])) {
+            g.drawFittedText(str, r, Justification::centred, 1);
+        }
     }
 }
 juce::Rectangle<int> ResponseCurveComponent::getRenderArea()
