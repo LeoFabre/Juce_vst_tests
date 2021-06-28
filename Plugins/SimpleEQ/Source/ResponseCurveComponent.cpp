@@ -39,7 +39,6 @@ void ResponseCurveComponent::updateChain()
 void ResponseCurveComponent::paint(juce::Graphics& g)
 {
     using namespace juce;
-    // (Our component is opaque, so we must completely fill the background with a solid colour)
     g.fillAll(Colours::black);
     g.drawImage(background, getLocalBounds().toFloat());
     auto responseArea = getAnalysisArea();
@@ -139,7 +138,6 @@ void ResponseCurveComponent::resized()
     for (const auto& gDb: gain)
     {
         auto y = jmap(gDb, -24.f, 24.f, float(bottom),float(top));
-//        g.drawHorizontalLine(y, 0, getWidth());
         g.setColour(gDb == 0.f ? Colour(0u, 172u, 1u) : Colours::darkgrey);
         g.drawHorizontalLine(y, left, right);
     }
@@ -186,6 +184,14 @@ void ResponseCurveComponent::resized()
         r.setX(getWidth() - textWidth);
         r.setCentre(r.getCentreX(), y);
         g.setColour(gDb == 0.f ? Colour(0u, 172u, 1u) : Colours::lightgrey);
+        g.drawFittedText(str, r, Justification::centred, 1);
+
+        str.clear();
+        str << (gDb - 24.f);
+        r.setX(1);
+        textWidth = g.getCurrentFont().getStringWidth(str);
+        r.setSize(textWidth, fontHeight);
+        g.setColour(Colours::lightgrey);
         g.drawFittedText(str, r, Justification::centred, 1);
     }
 }
