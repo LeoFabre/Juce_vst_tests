@@ -9,7 +9,7 @@ void RotarySliderWithLabels::paint(juce::Graphics& g)
     auto startAng = degreesToRadians(180.f + 45.f);
     auto endAng = degreesToRadians(180.f - 45.f) + MathConstants<float>::twoPi;
     auto range = getRange();
-    auto sliderBounds = getSliderBounds();
+    auto sliderBounds = getSliderBounds().toNearestInt();
 
 //    boundaries rectangles
 //    g.setColour(Colours::red);
@@ -22,12 +22,12 @@ void RotarySliderWithLabels::paint(juce::Graphics& g)
                                       sliderBounds.getY(),
                                       sliderBounds.getWidth(),
                                       sliderBounds.getHeight(),
-                                      jmap(getValue(), range.getStart(), range.getEnd(),0.0, 1.0),
+                                      (float)jmap(getValue(), range.getStart(), range.getEnd(),0.0, 1.0),
                                       startAng,
                                       endAng,
                                       *this);
     auto center = sliderBounds.toFloat().getCentre();
-    auto radius = sliderBounds.getWidth() * 0.5f;
+    auto radius = sliderBounds.toFloat().getWidth() * 0.5f;
     g.setColour({0u, 172u, 1u});
     g.setFont(getTextHeight());
     auto numChoices = labels.size();
@@ -45,18 +45,18 @@ void RotarySliderWithLabels::paint(juce::Graphics& g)
 
         Rectangle<float> r;
         auto str = labels[i].label;
-        r.setSize(g.getCurrentFont().getStringWidth(str), getTextHeight());
+        r.setSize(g.getCurrentFont().getStringWidthFloat(str), getTextHeight());
         r.setCentre(c);
         r.setY(r.getY() + getTextHeight());
         g.drawFittedText(str, r.toNearestInt(), Justification::centred, 1);
     }
 }
-juce::Rectangle<int> RotarySliderWithLabels::getSliderBounds() const
+juce::Rectangle<float> RotarySliderWithLabels::getSliderBounds() const
 {
-    auto bounds = getLocalBounds();
+    auto bounds = getLocalBounds().toFloat();
     auto size = juce::jmin(bounds.getWidth(), bounds.getHeight());
-    size -= getTextHeight() * 2;
-    juce::Rectangle<int> r;
+    size = size - getTextHeight() * 2;
+    juce::Rectangle<float> r;
     r.setSize(size, size);
     r.setCentre(bounds.getCentreX(), 0);
     r.setY(2);
@@ -70,7 +70,7 @@ juce::String RotarySliderWithLabels::getDisplayString() const
     juce::String str;
     bool addK = false;
     if (auto* floatParam = dynamic_cast<juce::AudioParameterFloat*>(param)) {
-        float val = getValue();
+        double val = getValue();
         if (val > 999.f) {
             val /= 1000.f;
             addK = true;

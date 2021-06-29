@@ -77,16 +77,16 @@ int SimpleEQAudioProcessor::getCurrentProgram()
     return 0;
 }
 
-void SimpleEQAudioProcessor::setCurrentProgram (int index)
+void SimpleEQAudioProcessor::setCurrentProgram (int /*index*/)
 {
 }
 
-const juce::String SimpleEQAudioProcessor::getProgramName (int index)
+const juce::String SimpleEQAudioProcessor::getProgramName (int /*index*/)
 {
     return {};
 }
 
-void SimpleEQAudioProcessor::changeProgramName (int index, const juce::String& newName)
+void SimpleEQAudioProcessor::changeProgramName (int /*index*/, const juce::String& /*newName*/)
 {
 }
 
@@ -142,7 +142,7 @@ bool SimpleEQAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts)
 }
 #endif
 
-void SimpleEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
+void SimpleEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& /*midiMessages*/)
 {
     juce::ScopedNoDenormals noDenormals;
     auto totalNumInputChannels  = getTotalNumInputChannels();

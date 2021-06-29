@@ -99,31 +99,31 @@ void SimpleEqAudioProcessorEditor::resized()
     analyzerEnabledArea.setWidth(100);
     analyzerEnabledArea.setX(5);
     analyzerEnabledArea.removeFromTop(2);
-    analyzerEnabledButton.setBounds(analyzerEnabledArea);
+    analyzerEnabledButton.setBounds(analyzerEnabledArea.toNearestInt());
     bounds.removeFromTop(5);
 
     float hRatio = 25.f/100.f;
-    auto responseArea = bounds.removeFromTop(bounds.getHeight() * hRatio);
+    auto responseArea = bounds.removeFromTop(bounds.proportionOfHeight(hRatio));
 
     responseCurveComponent.setBounds(responseArea);
 
     bounds.removeFromTop(5);
-    auto lowCutArea = bounds.removeFromLeft(bounds.getWidth() * 0.33);
-    auto highCutArea = bounds.removeFromRight(bounds.getWidth() * 0.5);
+    auto lowCutArea = bounds.removeFromLeft(bounds.proportionOfWidth(0.33));
+    auto highCutArea = bounds.removeFromRight(bounds.proportionOfWidth(0.5));
 
 
-    lowCutBybassButton.setBounds(lowCutArea.removeFromTop(25));
-    LowCutFreqSlider.setBounds(lowCutArea.removeFromTop(lowCutArea.getHeight() * 0.5));
-    LowCutSlopeSlider.setBounds(lowCutArea);
+    lowCutBybassButton.setBounds(lowCutArea.removeFromTop(25).toNearestInt());
+    LowCutFreqSlider.setBounds(lowCutArea.removeFromTop(lowCutArea.proportionOfHeight(0.5)));
+    LowCutSlopeSlider.setBounds(lowCutArea.toNearestInt());
 
-    highCutBybassButton.setBounds(highCutArea.removeFromTop(25));
-    HighCutFreqSlider.setBounds(highCutArea.removeFromTop(highCutArea.getHeight() * 0.5));
-    HighCutSlopeSlider.setBounds(highCutArea);
+    highCutBybassButton.setBounds(highCutArea.removeFromTop(25).toNearestInt());
+    HighCutFreqSlider.setBounds(highCutArea.removeFromTop(highCutArea.proportionOfHeight(0.5)));
+    HighCutSlopeSlider.setBounds(highCutArea.toNearestInt());
 
     peakBypassButton.setBounds(bounds.removeFromTop(25));
-    peakFreqSlider.setBounds(bounds.removeFromTop(bounds.getHeight() * 0.33));
-    peakGainSlider.setBounds(bounds.removeFromTop((bounds.getHeight() * 0.5)));
-    peakQualitySlider.setBounds(bounds);
+    peakFreqSlider.setBounds(bounds.removeFromTop(bounds.proportionOfHeight(0.33)));
+    peakGainSlider.setBounds(bounds.removeFromTop(bounds.proportionOfHeight(0.5)));
+    peakQualitySlider.setBounds(bounds.toNearestInt());
 }
 std::vector<juce::Component*> SimpleEqAudioProcessorEditor::getComps()
 {

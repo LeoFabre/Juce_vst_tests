@@ -19,13 +19,14 @@ enum FFTOrder
     order8192 = 13
 };
 
-template<typename BlockType>
+template <typename BlockType>
 struct FFTDataGenerator
 {
     /**
      produces the FFT data from an audio buffer.
      */
-    void produceFFTDataForRendering(const juce::AudioBuffer<float>& audioData, const float negativeInfinity)
+    void produceFFTDataForRendering(const juce::AudioBuffer<float>& audioData,
+                                    const float negativeInfinity)
     {
         const auto fftSize = getFFTSize();
 
@@ -34,21 +35,21 @@ struct FFTDataGenerator
         std::copy(readIndex, readIndex + fftSize, fftData.begin());
 
         // first apply a windowing function to our data
-        window->multiplyWithWindowingTable (fftData.data(), fftSize);       // [1]
+        window->multiplyWithWindowingTable(fftData.data(), fftSize); // [1]
 
         // then render our FFT data..
-        forwardFFT->performFrequencyOnlyForwardTransform (fftData.data());  // [2]
+        forwardFFT->performFrequencyOnlyForwardTransform(fftData.data()); // [2]
 
-        int numBins = (int)fftSize / 2;
+        int numBins = (int) fftSize / 2;
 
         //normalize the fft values.
-        for( int i = 0; i < numBins; ++i )
+        for (int i = 0; i < numBins; ++i)
         {
             fftData[i] /= (float) numBins;
         }
 
         //convert them to decibels
-        for( int i = 0; i < numBins; ++i )
+        for (int i = 0; i < numBins; ++i)
         {
             fftData[i] = juce::Decibels::gainToDecibels(fftData[i], negativeInfinity);
         }
@@ -66,7 +67,8 @@ struct FFTDataGenerator
         auto fftSize = getFFTSize();
 
         forwardFFT = std::make_unique<juce::dsp::FFT>(order);
-        window = std::make_unique<juce::dsp::WindowingFunction<float>>(fftSize, juce::dsp::WindowingFunction<float>::blackmanHarris);
+        window = std::make_unique<juce::dsp::WindowingFunction<float>>(
+            fftSize, juce::dsp::WindowingFunction<float>::blackmanHarris);
 
         fftData.clear();
         fftData.resize(fftSize * 2, 0);
@@ -75,9 +77,13 @@ struct FFTDataGenerator
     }
     //==============================================================================
     int getFFTSize() const { return 1 << order; }
-    int getNumAvailableFFTDataBlocks() const { return fftDataFifo.getNumAvailableForReading(); }
+    int getNumAvailableFFTDataBlocks() const
+    {
+        return fftDataFifo.getNumAvailableForReading();
+    }
     //==============================================================================
     bool getFFTData(BlockType& fftData) { return fftDataFifo.pull(fftData); }
+
 private:
     FFTOrder order;
     BlockType fftData;
@@ -87,51 +93,46 @@ private:
     Fifo<BlockType> fftDataFifo;
 };
 
-template<typename PathType>
+template <typename PathType>
 struct AnalyzerPathGenerator
 {
     /*
      converts 'renderData[]' into a juce::Path
      */
     void generatePath(const std::vector<float>& renderData,
-        juce::Rectangle<float> fftBounds,
-        int fftSize,
-        float binWidth,
-        float negativeInfinity)
+                      juce::Rectangle<float> fftBounds,
+                      int fftSize,
+                      float binWidth,
+                      float negativeInfinity)
     {
         auto top = fftBounds.getY();
         auto bottom = fftBounds.getHeight();
         auto width = fftBounds.getWidth();
 
-        int numBins = (int)fftSize / 2;
+        int numBins = (int) fftSize / 2;
 
         PathType p;
-        p.preallocateSpace(3 * (int)fftBounds.getWidth());
+        p.preallocateSpace(3 * (int) fftBounds.getWidth());
 
         auto map = [bottom, top, negativeInfinity](float v)
-        {
-          return juce::jmap(v,
-              negativeInfinity, 0.f,
-              float(bottom),   top);
-        };
+        { return juce::jmap(v, negativeInfinity, 0.f, float(bottom), top); };
 
         auto y = map(renderData[0]);
 
-        jassert( !std::isnan(y) && !std::isinf(y) );
+        jassert(!std::isnan(y) && !std::isinf(y));
 
         p.startNewSubPath(0, y);
 
-        const int pathResolution = 2; //you can draw line-to's every 'pathResolution' pixels.
+        //you can draw line-to's every 'pathResolution' pixels.
+        const int pathResolution = 2;
 
-        for( int binNum = 1; binNum < numBins; binNum += pathResolution )
+        for (int binNum = 1; binNum < numBins; binNum += pathResolution)
         {
             y = map(renderData[binNum]);
-
-            jassert( !std::isnan(y) && !std::isinf(y) );
-
-            if( !std::isnan(y) && !std::isinf(y) )
+            jassert(!std::isnan(y) && !std::isinf(y));
+            if (!std::isnan(y) && !std::isinf(y))
             {
-                auto binFreq = binNum * binWidth;
+                auto binFreq = (float)binNum * binWidth;
                 auto normalizedBinX = juce::mapFromLog10(binFreq, 20.f, 20000.f);
                 int binX = std::floor(normalizedBinX * width);
                 p.lineTo(binX, y);
@@ -141,15 +142,10 @@ struct AnalyzerPathGenerator
         pathFifo.push(p);
     }
 
-    int getNumPathsAvailable() const
-    {
-        return pathFifo.getNumAvailableForReading();
-    }
+    int getNumPathsAvailable() const { return pathFifo.getNumAvailableForReading(); }
 
-    bool getPath(PathType& path)
-    {
-        return pathFifo.pull(path);
-    }
+    bool getPath(PathType& path) { return pathFifo.pull(path); }
+
 private:
     Fifo<PathType> pathFifo;
 };
@@ -169,20 +165,21 @@ struct LookAndFeel : juce::LookAndFeel_V4
                           juce::ToggleButton& button,
                           bool shouldDrawButtonAsHighlighted,
                           bool shouldDrawButtonAsDown) override;
-    void drawPowerButton(juce::Graphics& g, const juce::ToggleButton& toggleButton) const;
-    void drawAnalButton(juce::Graphics& g, juce::ToggleButton& button);
+    static void drawPowerButton(juce::Graphics& g, const juce::ToggleButton& toggleButton) ;
+    static void drawAnalButton(juce::Graphics& g, juce::ToggleButton& button);
 };
 
 struct PathProducer
 {
-    PathProducer(SingleChannelSampleFifo<SimpleEQAudioProcessor::BlockType>& scsf) :
-        leftChannelFifo(&scsf)
+    PathProducer(SingleChannelSampleFifo<SimpleEQAudioProcessor::BlockType>& scsf)
+        : leftChannelFifo(&scsf)
     {
         leftChannelFFTDataGenerator.changeOrder(FFTOrder::order2048);
         monoBuffer.setSize(1, leftChannelFFTDataGenerator.getFFTSize());
     }
     void process(juce::Rectangle<float> fftBounds, double sampleRate);
     juce::Path getPath() { return leftChannelFFTPath; }
+
 private:
     SingleChannelSampleFifo<SimpleEQAudioProcessor::BlockType>* leftChannelFifo;
     juce::AudioBuffer<float> monoBuffer;
@@ -191,7 +188,8 @@ private:
     juce::Path leftChannelFFTPath;
 };
 
-struct ResponseCurveComponent: juce::Component
+struct ResponseCurveComponent
+    : juce::Component
     , juce::AudioProcessorParameter::Listener
     , juce::Timer
 {
@@ -199,7 +197,7 @@ struct ResponseCurveComponent: juce::Component
     ~ResponseCurveComponent();
 
     void parameterValueChanged(int parameterIndex, float newValue) override;
-    void parameterGestureChanged(int parameterIndex, bool gestureIsStarting) override {};
+    void parameterGestureChanged(int /*parameterIndex*/, bool /*gestureIsStarting*/) override {};
     void timerCallback() override;
     void paint(juce::Graphics& g) override;
     void resized() override;
@@ -222,23 +220,25 @@ private:
 
 struct RotarySliderWithLabels : juce::Slider
 {
-    RotarySliderWithLabels(juce::RangedAudioParameter& rap, const juce::String& unitSuffix)
+    RotarySliderWithLabels(juce::RangedAudioParameter& rap,
+                           const juce::String& unitSuffix)
         : juce::Slider(juce::Slider::SliderStyle::RotaryVerticalDrag,
-                       juce::Slider::TextEntryBoxPosition::NoTextBox),
-        param(&rap),
-        suffix(unitSuffix)
+                       juce::Slider::TextEntryBoxPosition::NoTextBox)
+        , param(&rap)
+        , suffix(unitSuffix)
     {
         setLookAndFeel(&lnf);
     }
     ~RotarySliderWithLabels() { setLookAndFeel(nullptr); }
-    struct LabelPos{
+    struct LabelPos
+    {
         float pos;
         juce::String label;
     };
     juce::Array<LabelPos> labels;
     void paint(juce::Graphics& graphics) override;
-    juce::Rectangle<int> getSliderBounds() const;
-    int getTextHeight() const { return 14; }
+    juce::Rectangle<float> getSliderBounds() const;
+    float getTextHeight() const { return 14.f; }
     juce::String getDisplayString() const;
 
 private:
@@ -247,14 +247,17 @@ private:
     LookAndFeel lnf;
 };
 
-class PowerButton : public juce::ToggleButton {};
-class AnalyzerButton : public juce::ToggleButton {};
+class PowerButton : public juce::ToggleButton
+{
+};
+class AnalyzerButton : public juce::ToggleButton
+{
+};
 
 //==============================================================================
 /**
 */
-class SimpleEqAudioProcessorEditor
-    : public juce::AudioProcessorEditor
+class SimpleEqAudioProcessorEditor : public juce::AudioProcessorEditor
 {
 public:
     SimpleEqAudioProcessorEditor(SimpleEQAudioProcessor&);
@@ -298,7 +301,6 @@ private:
     ButtonAttachment highCutBybassButtonAttachment;
     ButtonAttachment peakBypassButtonAttachment;
     ButtonAttachment analyzerEnabledButtonAttachment;
-
 
     std::vector<juce::Component*> getComps();
 

@@ -59,27 +59,27 @@ void LookAndFeel::drawToggleButton(juce::Graphics& g,
                                    bool shouldDrawButtonAsDown)
 {
     using namespace juce;
-    if (auto* pb = dynamic_cast<PowerButton*>(&button)) {
+    if (dynamic_cast<PowerButton*>(&button)) {
         drawPowerButton(g, button);
     }
-    else if (auto* analb = dynamic_cast<AnalyzerButton*>(&button))
+    else if (dynamic_cast<AnalyzerButton*>(&button))
     {
         drawAnalButton(g, button);
     }
 }
 void LookAndFeel::drawPowerButton(juce::Graphics& g,
-                                  const juce::ToggleButton& toggleButton) const
+                                  const juce::ToggleButton& toggleButton)
 {
     juce::Path powerButton;
     auto bounds = toggleButton.getLocalBounds();
-    auto size = juce::jmin(bounds.getWidth(), bounds.getHeight() - 6);
-    auto r = bounds.withSizeKeepingCentre(size, size).toFloat();
+    auto size = juce::jmin(bounds.toFloat().getWidth(), bounds.toFloat().getHeight() - 6);
+    auto r = bounds.toFloat().withSizeKeepingCentre(size, size).toFloat();
     float ang = 30.f;
     size -= 6;
     powerButton.addCentredArc(r.getCentreX(),
                               r.getCentreY(),
-                              size * 0.5,
-                              size * 0.5,
+                              size * 0.5f,
+                              size * 0.5f,
                               0.f,
                               juce::degreesToRadians(ang),
                               juce::degreesToRadians(360.f - ang),
@@ -99,13 +99,13 @@ void LookAndFeel::drawAnalButton(juce::Graphics& g, juce::ToggleButton& button)
     g.setColour(color);
     auto bounds = button.getLocalBounds();
     g.drawRect(bounds);
-    auto insetRect = bounds.reduced(4);
+    auto insetRect = bounds.reduced(4).toFloat();
     Path randomPath;
     Random random;
     auto startY = insetRect.getY() + insetRect.getHeight();
     randomPath.startNewSubPath(
         insetRect.getX(), startY * random.nextFloat());
-    for (int x = 0; x < insetRect.getRight(); x+=2) {
+    for (int x = 0; x <= insetRect.getRight(); x+=2) {
         randomPath.lineTo(x, startY * random.nextFloat());
     }
     g.strokePath(randomPath, PathStrokeType(1.f));
