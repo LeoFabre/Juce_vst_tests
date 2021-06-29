@@ -45,6 +45,7 @@ SimpleEqAudioProcessorEditor::SimpleEqAudioProcessorEditor(SimpleEQAudioProcesso
     peakBypassButton.setLookAndFeel(&lnf);
     lowCutBybassButton.setLookAndFeel(&lnf);
     highCutBybassButton.setLookAndFeel(&lnf);
+    analyzerEnabledButton.setLookAndFeel(&lnf);
     setSize(600, 480);
 }
 void SimpleEqAudioProcessorEditor::addLabels()
@@ -70,6 +71,7 @@ SimpleEqAudioProcessorEditor::~SimpleEqAudioProcessorEditor()
     peakBypassButton.setLookAndFeel(nullptr);
     lowCutBybassButton.setLookAndFeel(nullptr);
     highCutBybassButton.setLookAndFeel(nullptr);
+    analyzerEnabledButton.setLookAndFeel(nullptr);
 }
 
 //==============================================================================
@@ -85,6 +87,14 @@ void SimpleEqAudioProcessorEditor::resized()
     // This is generally where you'll want to lay out the positions of any
     // subcomponents in your editor..
     auto bounds = getLocalBounds();
+
+    auto analyzerEnabledArea = bounds.removeFromTop(25);
+    analyzerEnabledArea.setWidth(100);
+    analyzerEnabledArea.setX(5);
+    analyzerEnabledArea.removeFromTop(2);
+    analyzerEnabledButton.setBounds(analyzerEnabledArea);
+    bounds.removeFromTop(5);
+
     float hRatio = 25.f/100.f;
     auto responseArea = bounds.removeFromTop(bounds.getHeight() * hRatio);
 

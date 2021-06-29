@@ -166,9 +166,11 @@ struct LookAndFeel : juce::LookAndFeel_V4
                           float rotaryEndAngle,
                           juce::Slider& slider) override;
     void drawToggleButton(juce::Graphics& g,
-                          juce::ToggleButton& toggleButton,
+                          juce::ToggleButton& button,
                           bool shouldDrawButtonAsHighlighted,
                           bool shouldDrawButtonAsDown) override;
+    void drawPowerButton(juce::Graphics& g, const juce::ToggleButton& toggleButton) const;
+    void drawAnalButton(juce::Graphics& g, juce::ToggleButton& button);
 };
 
 struct PathProducer
@@ -242,6 +244,9 @@ private:
     LookAndFeel lnf;
 };
 
+class PowerButton : public juce::ToggleButton {};
+class AnalyzerButton : public juce::ToggleButton {};
+
 //==============================================================================
 /**
 */
@@ -280,10 +285,10 @@ private:
     Attachment LowCutSlopeSliderAttachment;
     Attachment HighCutSlopeSliderAttachment;
 
-    juce::ToggleButton lowCutBybassButton;
-    juce::ToggleButton highCutBybassButton;
-    juce::ToggleButton peakBypassButton;
-    juce::ToggleButton analyzerEnabledButton;
+    PowerButton lowCutBybassButton;
+    PowerButton highCutBybassButton;
+    PowerButton peakBypassButton;
+    AnalyzerButton analyzerEnabledButton;
 
     using ButtonAttachment = APVTS::ButtonAttachment;
     ButtonAttachment lowCutBybassButtonAttachment;

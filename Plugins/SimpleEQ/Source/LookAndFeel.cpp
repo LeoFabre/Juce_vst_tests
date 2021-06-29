@@ -54,14 +54,25 @@ void LookAndFeel::drawRotarySlider(juce::Graphics& g,
     }
 }
 void LookAndFeel::drawToggleButton(juce::Graphics& g,
-                                   juce::ToggleButton& toggleButton,
+                                   juce::ToggleButton& button,
                                    bool shouldDrawButtonAsHighlighted,
                                    bool shouldDrawButtonAsDown)
 {
     using namespace juce;
-    Path powerButton;
+    if (auto* pb = dynamic_cast<PowerButton*>(&button)) {
+        drawPowerButton(g, button);
+    }
+    else if (auto* analb = dynamic_cast<AnalyzerButton*>(&button))
+    {
+        drawAnalButton(g, button);
+    }
+}
+void LookAndFeel::drawPowerButton(juce::Graphics& g,
+                                  const juce::ToggleButton& toggleButton) const
+{
+    juce::Path powerButton;
     auto bounds = toggleButton.getLocalBounds();
-    auto size = jmin(bounds.getWidth(), bounds.getHeight() - 6);
+    auto size = juce::jmin(bounds.getWidth(), bounds.getHeight() - 6);
     auto r = bounds.withSizeKeepingCentre(size, size).toFloat();
     float ang = 30.f;
     size -= 6;
@@ -70,14 +81,32 @@ void LookAndFeel::drawToggleButton(juce::Graphics& g,
                               size * 0.5,
                               size * 0.5,
                               0.f,
-                              degreesToRadians(ang),
-                              degreesToRadians(360.f - ang),
+                              juce::degreesToRadians(ang),
+                              juce::degreesToRadians(360.f - ang),
                               true);
     powerButton.startNewSubPath(r.getCentreX(), r.getY());
     powerButton.lineTo(r.getCentre());
-    PathStrokeType pathStrokeType(2.f, PathStrokeType::curved);
-    auto color = toggleButton.getToggleState() ? Colours::dimgrey : Colour(0u, 172u, 1u);
+    juce::PathStrokeType pathStrokeType(2.f, juce::PathStrokeType::curved);
+    auto color = toggleButton.getToggleState() ? juce::Colours::dimgrey : juce::Colour(0u, 172u, 1u);
     g.setColour(color);
     g.strokePath(powerButton, pathStrokeType);
     g.drawEllipse(r, 2);
+}
+void LookAndFeel::drawAnalButton(juce::Graphics& g, juce::ToggleButton& button)
+{
+    using namespace juce;
+    auto color = !button.getToggleState() ? juce::Colours::dimgrey : juce::Colour(0u, 172u, 1u);
+    g.setColour(color);
+    auto bounds = button.getLocalBounds();
+    g.drawRect(bounds);
+    auto insetRect = bounds.reduced(4);
+    Path randomPath;
+    Random random;
+    auto startY = insetRect.getY() + insetRect.getHeight();
+    randomPath.startNewSubPath(
+        insetRect.getX(), startY * random.nextFloat());
+    for (int x = 0; x < insetRect.getRight(); x+=2) {
+        randomPath.lineTo(x, startY * random.nextFloat());
+    }
+    g.strokePath(randomPath, PathStrokeType(1.f));
 }
