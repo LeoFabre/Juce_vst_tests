@@ -46,6 +46,13 @@ SimpleEqAudioProcessorEditor::SimpleEqAudioProcessorEditor(SimpleEQAudioProcesso
     lowCutBybassButton.setLookAndFeel(&lnf);
     highCutBybassButton.setLookAndFeel(&lnf);
     analyzerEnabledButton.setLookAndFeel(&lnf);
+    auto safePtr = juce::Component::SafePointer<SimpleEqAudioProcessorEditor>(this);
+    analyzerEnabledButton.onClick = [safePtr](){
+        if (auto *comp = safePtr.getComponent()) {
+            auto enabled = comp->analyzerEnabledButton.getToggleState();
+            comp->responseCurveComponent.shouldDraw(enabled);
+        }
+    };
     setSize(600, 480);
 }
 void SimpleEqAudioProcessorEditor::addLabels()

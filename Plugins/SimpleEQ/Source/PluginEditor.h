@@ -204,7 +204,10 @@ struct ResponseCurveComponent: juce::Component
     void paint(juce::Graphics& g) override;
     void resized() override;
 
+    void shouldDraw(bool b);
+
 private:
+    bool _shouldDrawFFT = true;
     SimpleEQAudioProcessor& audioProcessor;
     juce::Atomic<bool> parametersChanged {false};
     MonoChain monoChain;
