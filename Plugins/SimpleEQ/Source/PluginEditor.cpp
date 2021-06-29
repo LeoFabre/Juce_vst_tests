@@ -42,7 +42,9 @@ SimpleEqAudioProcessorEditor::SimpleEqAudioProcessorEditor(SimpleEQAudioProcesso
     {
         addAndMakeVisible(comp);
     }
-    const auto& params = audioProcessor.getParameters();
+    peakBypassButton.setLookAndFeel(&lnf);
+    lowCutBybassButton.setLookAndFeel(&lnf);
+    highCutBybassButton.setLookAndFeel(&lnf);
     setSize(600, 480);
 }
 void SimpleEqAudioProcessorEditor::addLabels()
@@ -65,6 +67,9 @@ void SimpleEqAudioProcessorEditor::addLabels()
 
 SimpleEqAudioProcessorEditor::~SimpleEqAudioProcessorEditor()
 {
+    peakBypassButton.setLookAndFeel(nullptr);
+    lowCutBybassButton.setLookAndFeel(nullptr);
+    highCutBybassButton.setLookAndFeel(nullptr);
 }
 
 //==============================================================================
