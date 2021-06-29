@@ -29,7 +29,11 @@ SimpleEqAudioProcessorEditor::SimpleEqAudioProcessorEditor(SimpleEQAudioProcesso
     , highCutFreqSliderAttachment(audioProcessor.apvts, "HighCut Freq", HighCutFreqSlider)
     , LowCutSlopeSliderAttachment(audioProcessor.apvts, "LowCut Slope", LowCutSlopeSlider)
     , HighCutSlopeSliderAttachment(audioProcessor.apvts, "HighCut Slope", HighCutSlopeSlider),
-    responseCurveComponent(audioProcessor)
+    responseCurveComponent(audioProcessor),
+    lowCutBybassButtonAttachment(audioProcessor.apvts, "LowCut Bypassed", lowCutBybassButton),
+    peakBypassButtonAttachment(audioProcessor.apvts, "Peak Bypassed", peakBypassButton),
+    highCutBybassButtonAttachment(audioProcessor.apvts, "HighCut Bypassed", highCutBybassButton),
+    analyzerEnabledButtonAttachment(audioProcessor.apvts, "Analyzer Enabled", analyzerEnabledButton)
 {
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
@@ -85,12 +89,16 @@ void SimpleEqAudioProcessorEditor::resized()
     auto lowCutArea = bounds.removeFromLeft(bounds.getWidth() * 0.33);
     auto highCutArea = bounds.removeFromRight(bounds.getWidth() * 0.5);
 
+
+    lowCutBybassButton.setBounds(lowCutArea.removeFromTop(25));
     LowCutFreqSlider.setBounds(lowCutArea.removeFromTop(lowCutArea.getHeight() * 0.5));
     LowCutSlopeSlider.setBounds(lowCutArea);
 
+    highCutBybassButton.setBounds(highCutArea.removeFromTop(25));
     HighCutFreqSlider.setBounds(highCutArea.removeFromTop(highCutArea.getHeight() * 0.5));
     HighCutSlopeSlider.setBounds(highCutArea);
 
+    peakBypassButton.setBounds(bounds.removeFromTop(25));
     peakFreqSlider.setBounds(bounds.removeFromTop(bounds.getHeight() * 0.33));
     peakGainSlider.setBounds(bounds.removeFromTop((bounds.getHeight() * 0.5)));
     peakQualitySlider.setBounds(bounds);
@@ -105,6 +113,11 @@ std::vector<juce::Component*> SimpleEqAudioProcessorEditor::getComps()
         &HighCutFreqSlider,
         &LowCutSlopeSlider,
         &HighCutSlopeSlider,
-        &responseCurveComponent
+        &responseCurveComponent,
+
+        &lowCutBybassButton,
+        &highCutBybassButton,
+        &peakBypassButton,
+        &analyzerEnabledButton
     };
 }

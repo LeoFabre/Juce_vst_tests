@@ -25,7 +25,8 @@ struct ChainSettings
 {
     float peakFreq {0}, peakGainDecibels {0}, peakQuality {0};
     float lowCutFreq {0}, highCutFreq {0};
-    int lowCutSlope {0}, highCutSlope {0};
+    Slope lowCutSlope {Slope_12}, highCutSlope {Slope_12};
+    bool lowCutBypassed {false}, peakBypassed {false}, highCutBypassed {false};
 };
 
 using Filter = juce::dsp::IIR::Filter<float>;
